@@ -1035,3 +1035,206 @@ body {
         right: -100%;
     }
 }
+
+/* Theme Toggle Button & CSV Export / Copy Buttons Styles */
+.btn-secondary {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+    border-color: var(--border-hover);
+}
+
+.btn-theme-toggle {
+    min-width: 130px;
+}
+
+.btn-export-csv {
+    min-width: 130px;
+}
+
+/* Icons toggling */
+.btn-icon svg.hidden {
+    display: none;
+}
+
+/* Copy to Clipboard card button styling */
+.btn-copy-clipboard {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.btn-copy-clipboard:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-copy-clipboard.copied-active {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--color-feature);
+    color: var(--color-feature);
+}
+
+.btn-copy-clipboard svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Adjust card footer to layout multiple actions nicely */
+.card-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* LIGHT THEME IMPLEMENTATION */
+body.light-theme {
+    --bg-base: #f8fafc;
+    --bg-surface: rgba(255, 255, 255, 0.85);
+    --bg-surface-hover: rgba(241, 245, 249, 0.9);
+    --bg-card: rgba(255, 255, 255, 0.7);
+    --border-color: rgba(0, 0, 0, 0.08);
+    --border-hover: rgba(0, 0, 0, 0.15);
+    
+    --primary: #0284c7;
+    --primary-glow: rgba(2, 132, 199, 0.15);
+    --primary-dark: #0369a1;
+    --primary-light: #0ea5e9;
+    
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+    
+    --glow-cyan: #0ea5e9;
+    --glow-purple: #8b5cf6;
+    
+    --color-feature-bg: rgba(16, 185, 129, 0.08);
+    --color-change-bg: rgba(245, 158, 11, 0.08);
+    --color-deprecation-bg: rgba(239, 68, 68, 0.08);
+    --color-notice-bg: rgba(168, 85, 247, 0.08);
+    --color-other-bg: rgba(107, 114, 128, 0.08);
+}
+
+body.light-theme .glow-orb {
+    opacity: 0.15;
+}
+
+body.light-theme .btn-secondary {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.08);
+    color: #475569;
+}
+
+body.light-theme .btn-secondary:hover {
+    background: rgba(0, 0, 0, 0.06);
+    color: #0f172a;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.light-theme .btn-tweet {
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #475569;
+}
+
+body.light-theme .btn-tweet:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #0f172a;
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.light-theme .btn-copy-clipboard {
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #475569;
+}
+
+body.light-theme .btn-copy-clipboard:hover {
+    background: rgba(0, 0, 0, 0.04);
+    color: #0f172a;
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+body.light-theme .tweet-preview-card {
+    background: #f8fafc;
+    border-color: rgba(0, 0, 0, 0.15);
+}
+
+body.light-theme .tweet-display-name {
+    color: #0f172a;
+}
+
+body.light-theme .tweet-preview-body {
+    color: #1e293b;
+}
+
+body.light-theme .tweet-preview-footer {
+    border-top-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .btn-tweet-action {
+    background: #0f172a;
+    color: #fff;
+}
+
+body.light-theme .btn-tweet-action:hover {
+    background: #1e293b;
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+body.light-theme .card-body code {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: rgba(0, 0, 0, 0.03);
+    color: #0f172a;
+}
+
+body.light-theme .selected-note-preview {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+body.light-theme .composer-drawer {
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: -10px 0 40px rgba(0, 0, 0, 0.1);
+    border-left-color: rgba(0, 0, 0, 0.08);
+}
+
+body.light-theme .tweet-textarea {
+    background: rgba(255, 255, 255, 0.8);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light-theme .tweet-textarea:focus {
+    background: #fff;
+    border-color: var(--primary);
+}
+
+body.light-theme .card-source-link {
+    color: #475569;
+}
+body.light-theme .card-source-link:hover {
+    color: var(--primary);
+}
+
+@media (max-width: 680px) {
+    .header-actions {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .btn-theme-toggle, .btn-export-csv, .btn-refresh {
+        width: 100% !important;
+    }
+}
