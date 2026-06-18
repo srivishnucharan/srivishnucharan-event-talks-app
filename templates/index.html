@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A premium, modern dashboard for tracking Google Cloud BigQuery release notes and sharing updates directly to Twitter/X.">
+    <title>BigQuery Release Pulse | Developer Dashboard</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Main Stylesheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Background decorative glows -->
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+
+        <!-- Sidebar / Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <defs>
+                            <linearGradient id="logoGrad" x1="2" y1="2" x2="22" y2="22" gradientUnits="userSpaceOnUse">
+                                <stop stop-color="#00f2fe"/>
+                                <stop offset="1" stop-color="#4facfe"/>
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <span class="brand-text">BQ Pulse</span>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" id="nav-all">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                    <span>All Updates</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-features">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                    <span>Features</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-changes">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path></svg>
+                    <span>Changes</span>
+                </a>
+                <a href="#" class="nav-item" id="nav-deprecations">
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                    <span>Deprecations</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="status-indicator-wrapper">
+                    <span class="status-dot online"></span>
+                    <span class="status-label" id="api-status">Connecting...</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="app-header">
+                <div class="header-left">
+                    <h1 class="page-title">BigQuery Release Notes</h1>
+                    <p class="page-subtitle">Track, filter, and tweet the latest BigQuery updates instantly.</p>
+                </div>
+                
+                <div class="header-actions">
+                    <button id="btn-refresh" class="btn btn-primary btn-refresh" aria-label="Refresh release notes">
+                        <span class="btn-icon">
+                            <svg class="refresh-spinner" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                            </svg>
+                        </span>
+                        <span class="btn-text">Refresh Feed</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Search and Quick Filter Bar -->
+            <section class="controls-section">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="search-input" placeholder="Search updates (e.g. embeddings, storage, tables)..." aria-label="Search release notes">
+                </div>
+                
+                <div class="stats-badge" id="stats-counter">
+                    Loaded: <span id="notes-count">0</span> updates
+                </div>
+            </section>
+
+            <!-- Content Area (Cards) -->
+            <section class="content-section" id="notes-container">
+                <!-- Skeleton Loader (displayed during loading) -->
+                <div class="skeleton-container" id="skeleton-loader">
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                    <div class="skeleton-card"></div>
+                </div>
+
+                <!-- Actual Feed Cards will be inserted here dynamically -->
+                <div class="notes-feed" id="notes-feed"></div>
+
+                <!-- Empty State (displayed if no updates match filter/search) -->
+                <div class="empty-state hidden" id="empty-state">
+                    <div class="empty-icon">📂</div>
+                    <h3 class="empty-title">No release notes found</h3>
+                    <p class="empty-description">Try adjusting your filters or search terms, or refresh the feed to retrieve updates.</p>
+                </div>
+            </section>
+        </main>
+
+        <!-- Right Side Twitter Composer Drawer -->
+        <div class="composer-overlay" id="composer-overlay"></div>
+        <section class="composer-drawer" id="composer-drawer">
+            <div class="composer-header">
+                <h2 class="drawer-title">Compose Tweet</h2>
+                <button class="btn-close-drawer" id="btn-close-drawer" aria-label="Close composer">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div class="composer-body">
+                <!-- Selected Note Context Preview -->
+                <div class="selected-note-preview">
+                    <div class="preview-badge-row">
+                        <span class="preview-badge" id="preview-type-badge">Feature</span>
+                        <span class="preview-date" id="preview-date-badge">June 17, 2026</span>
+                    </div>
+                    <div class="preview-content-text" id="preview-summary-text">
+                        Select a release note to share on Twitter/X.
+                    </div>
+                </div>
+
+                <!-- Tweet Edit Area -->
+                <div class="tweet-editor-wrapper">
+                    <label for="tweet-textarea" class="editor-label">Tweet Content</label>
+                    <textarea id="tweet-textarea" class="tweet-textarea" rows="6" maxlength="280" placeholder="What's happening?"></textarea>
+                    
+                    <div class="editor-footer">
+                        <span class="char-count-badge" id="char-counter">
+                            <span id="char-count">0</span> / 280
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Real-time Tweet Preview Card -->
+                <div class="tweet-preview-card">
+                    <div class="tweet-preview-header">
+                        <div class="tweet-avatar">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="12" cy="12" r="10" fill="#1e293b"/>
+                                <path d="M12 6a3 3 0 100 6 3 3 0 000-6zm-6 10.7c0-2.4 4-3.7 6-3.7s6 1.3 6 3.7V18H6v-1.3z" fill="#94a3b8"/>
+                            </svg>
+                        </div>
+                        <div class="tweet-user-info">
+                            <span class="tweet-display-name">You</span>
+                            <span class="tweet-username">@your_handle</span>
+                        </div>
+                    </div>
+                    <div class="tweet-preview-body" id="tweet-preview-body-text">
+                        Your tweet draft will show here...
+                    </div>
+                    <div class="tweet-preview-footer">
+                        <div class="tweet-preview-actions">
+                            <!-- SVG Twitter icons for preview aesthetic -->
+                            <span>💬 0</span>
+                            <span>🔁 0</span>
+                            <span>❤️ 0</span>
+                            <span>📊 0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="composer-footer">
+                <button id="btn-share-tweet" class="btn btn-primary btn-tweet-action">
+                    <span class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                        </svg>
+                    </span>
+                    <span>Post to Twitter/X</span>
+                </button>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Script Logic -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
