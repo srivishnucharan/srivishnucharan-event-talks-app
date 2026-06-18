@@ -121,6 +121,10 @@
                 </div>
             </header>
 
+
+            <!-- Stale/Cached Data Warning Banner -->
+            <div id="warning-banner" class="warning-banner hidden"></div>
+
             <!-- Search and Quick Filter Bar -->
             <section class="controls-section">
                 <div class="search-box">
@@ -150,6 +154,7 @@
                     <div class="empty-icon">📂</div>
                     <h3 class="empty-title">No release notes found</h3>
                     <p class="empty-description">Try adjusting your filters or search terms, or refresh the feed to retrieve updates.</p>
+                    <button id="btn-clear-filters" class="btn btn-primary btn-clear-filters" style="margin-top: 1.25rem;">Clear Search & Filters</button>
                 </div>
             </section>
         </main>
@@ -217,14 +222,23 @@
                 </div>
             </div>
 
-            <div class="composer-footer">
-                <button id="btn-share-tweet" class="btn btn-primary btn-tweet-action">
+            <div class="composer-footer" style="display: flex; gap: 0.75rem;">
+                <button id="btn-copy-draft" class="btn btn-secondary" style="flex-grow: 1;" aria-label="Copy draft text to clipboard">
+                    <span class="btn-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                        </svg>
+                    </span>
+                    <span class="btn-text">Copy Draft</span>
+                </button>
+                <button id="btn-share-tweet" class="btn btn-primary btn-tweet-action" style="flex-grow: 1;">
                     <span class="btn-icon">
                         <svg viewBox="0 0 24 24" fill="currentColor">
                             <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                         </svg>
                     </span>
-                    <span>Post to Twitter/X</span>
+                    <span>Post to X</span>
                 </button>
             </div>
         </section>

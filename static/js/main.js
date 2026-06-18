@@ -4,6 +4,7 @@ let filteredNotes = [];
 let currentFilter = 'all';
 let searchQuery = '';
 let selectedUpdate = null;
+let readUpdates = new Set(JSON.parse(localStorage.getItem('read_updates') || '[]'));
 
 // DOM Elements
 const notesFeed = document.getElementById('notes-feed');
@@ -59,9 +60,24 @@ async function loadNotes(forceRefresh = false) {
             setAPIStatus('online', 'Connected');
             
             // Display warnings if any
+            const warningBanner = document.getElementById('warning-banner');
             if (data.warning) {
                 console.warn(data.warning);
                 setAPIStatus('warning', 'Cached (Offline)');
+                if (warningBanner) {
+                    warningBanner.innerHTML = `
+                        <span class="warning-text">⚠️ ${data.warning}</span>
+                        <button class="btn-close-banner" id="btn-close-warning" aria-label="Close warning banner">&times;</button>
+                    `;
+                    warningBanner.classList.remove('hidden');
+                    document.getElementById('btn-close-warning').addEventListener('click', () => {
+                        warningBanner.classList.add('hidden');
+                    });
+                }
+            } else {
+                if (warningBanner) {
+                    warningBanner.classList.add('hidden');
+                }
             }
         } else {
             throw new Error(data.error || 'Failed fetching feed');
@@ -217,9 +233,13 @@ function renderFeed() {
                 badgeClass = uTypeLower;
             }
             
+            const isRead = readUpdates.has(cardId);
+            const unreadDotHtml = isRead ? '' : '<span class="unread-dot" title="New update"></span>';
+            
             card.innerHTML = `
                 <div class="card-header">
                     <div class="badge-row">
+                        ${unreadDotHtml}
                         <span class="badge ${badgeClass}">${update.type}</span>
                     </div>
                     <a href="${entry.link}" target="_blank" rel="noopener noreferrer" class="card-source-link" title="View official GCloud release note">
@@ -259,14 +279,23 @@ function renderFeed() {
             
             // Attach Copy Button Click Handler
             const btnCopy = card.querySelector('.btn-copy-clipboard');
-            btnCopy.addEventListener('click', () => {
+            btnCopy.addEventListener('click', (e) => {
+                e.stopPropagation();
                 copyToClipboard(update.text, btnCopy);
+                markAsRead(cardId);
             });
             
             // Attach Tweet Button Click Handler
             const btnCompose = card.querySelector('.btn-tweet');
-            btnCompose.addEventListener('click', () => {
+            btnCompose.addEventListener('click', (e) => {
+                e.stopPropagation();
                 openComposer(entry.date, update, cardId);
+                markAsRead(cardId);
+            });
+            
+            // Mark read on click
+            card.addEventListener('click', () => {
+                markAsRead(cardId);
             });
             
             dateGroup.appendChild(card);
@@ -369,15 +398,45 @@ function updateTweetPreview() {
     // Handle tweet preview rendering (escapes and renders linebreaks)
     tweetPreviewBodyText.textContent = text || 'Your tweet draft will show here...';
     
-    // Enable/Disable Tweet Button
+    // Handle character overflow warning message
+    let warningElement = document.getElementById('overflow-warning-message');
+    if (count > 280) {
+        tweetTextarea.classList.add('textarea-error');
+        const overflow = count - 280;
+        if (!warningElement) {
+            warningElement = document.createElement('div');
+            warningElement.id = 'overflow-warning-message';
+            warningElement.className = 'overflow-warning-message';
+            tweetTextarea.parentNode.insertBefore(warningElement, tweetTextarea.nextSibling);
+        }
+        warningElement.textContent = `⚠️ Draft is too long by ${overflow} character${overflow > 1 ? 's' : ''}`;
+    } else {
+        tweetTextarea.classList.remove('textarea-error');
+        if (warningElement) {
+            warningElement.remove();
+        }
+    }
+    
+    // Enable/Disable Tweet Buttons
+    const btnCopyDraft = document.getElementById('btn-copy-draft');
     if (count === 0 || count > 280) {
         btnShareTweet.disabled = true;
         btnShareTweet.style.opacity = '0.5';
         btnShareTweet.style.cursor = 'not-allowed';
+        if (btnCopyDraft) {
+            btnCopyDraft.disabled = true;
+            btnCopyDraft.style.opacity = '0.5';
+            btnCopyDraft.style.cursor = 'not-allowed';
+        }
     } else {
         btnShareTweet.disabled = false;
         btnShareTweet.style.opacity = '1';
         btnShareTweet.style.cursor = 'pointer';
+        if (btnCopyDraft) {
+            btnCopyDraft.disabled = false;
+            btnCopyDraft.style.opacity = '1';
+            btnCopyDraft.style.cursor = 'pointer';
+        }
     }
 }
 
@@ -453,6 +512,43 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnExportCsv = document.getElementById('btn-export-csv');
     if (btnExportCsv) {
         btnExportCsv.addEventListener('click', exportToCSV);
+    }
+
+    // Copy Draft Button in Composer Handler
+    const btnCopyDraft = document.getElementById('btn-copy-draft');
+    if (btnCopyDraft) {
+        btnCopyDraft.addEventListener('click', async () => {
+            const draftText = tweetTextarea.value;
+            if (!draftText) return;
+            try {
+                await navigator.clipboard.writeText(draftText);
+                const btnTextSpan = btnCopyDraft.querySelector('.btn-text');
+                const originalText = btnTextSpan.textContent;
+                btnCopyDraft.classList.add('copied-active');
+                btnTextSpan.textContent = 'Copied Draft!';
+                setTimeout(() => {
+                    btnCopyDraft.classList.remove('copied-active');
+                    btnTextSpan.textContent = originalText;
+                }, 2000);
+            } catch (err) {
+                showErrorNotification('Failed to copy draft.');
+            }
+        });
+    }
+
+    // Clear Search & Filters Button Handler (in Empty State)
+    const btnClearFilters = document.getElementById('btn-clear-filters');
+    if (btnClearFilters) {
+        btnClearFilters.addEventListener('click', () => {
+            searchInput.value = '';
+            searchQuery = '';
+            currentFilter = 'all';
+            [navAll, navFeatures, navChanges, navDeprecations].forEach(nav => {
+                nav.classList.remove('active');
+            });
+            navAll.classList.add('active');
+            applyFiltersAndRender();
+        });
     }
 
     // Theme Toggle Handler
@@ -542,4 +638,19 @@ function exportToCSV() {
     link.click();
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
+}
+
+// Mark update as read and persist
+function markAsRead(cardId) {
+    if (!readUpdates.has(cardId)) {
+        readUpdates.add(cardId);
+        localStorage.setItem('read_updates', JSON.stringify(Array.from(readUpdates)));
+        const card = document.getElementById(cardId);
+        if (card) {
+            const pulseDot = card.querySelector('.unread-dot');
+            if (pulseDot) {
+                pulseDot.remove();
+            }
+        }
+    }
 }
